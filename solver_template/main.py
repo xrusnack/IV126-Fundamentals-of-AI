@@ -14,12 +14,18 @@ def write_instance_json(solution, file_path):
         json.dump(solution, f)
 
 
-instance_path = sys.argv[1]
-output_path = sys.argv[2]
+if __name__ == "__main__":
+    # Check if the correct number of arguments were provided
+    if len(sys.argv) != 3:
+        print("Usage: python3 main.py <instance-file-path> <solution-file-path>")
+        sys.exit(1)
 
-instance = read_instance_json(instance_path)
-naive_solution = [i for i in range(len(instance['Matrix']))] # TODO - implement something better
-write_instance_json(naive_solution, output_path)
+    instance_path = sys.argv[1]
+    output_path = sys.argv[2]
+
+    instance = read_instance_json(instance_path)
+    naive_solution = [i for i in range(len(instance['Matrix']))] # TODO - implement something better
+    write_instance_json(naive_solution, output_path)
 
 
 #######################################################################
