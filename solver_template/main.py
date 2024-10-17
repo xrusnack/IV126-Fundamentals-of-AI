@@ -1,15 +1,16 @@
+from typing import Any
 import random
 import sys
 import json
 import time
 
 
-def read_instance_json(file_path):
+def read_instance_json(file_path: str):
     with open(file_path) as f:
         return json.load(f)
 
 
-def write_instance_json(solution, file_path):
+def write_instance_json(solution: Any, file_path: str):
     with open(file_path, 'w') as f:
         json.dump(solution, f)
 
