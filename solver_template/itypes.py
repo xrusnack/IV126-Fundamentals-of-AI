@@ -1,6 +1,7 @@
 from typing import Dict, List, Literal
 
 type Root = Literal["Coodinates"] \
+    | Literal["Matrix"] \
     | Literal["GlobalBest"] \
     | Literal["GlobalBestVal"] \
     | Literal["Timeout"]
