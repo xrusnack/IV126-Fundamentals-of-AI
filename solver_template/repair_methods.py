@@ -9,8 +9,7 @@ def count_cost(solution: List[int], distance_matrix: List[List[int]]) -> int:
     return cost
 
 
-def count_cost_after_repair(index: int, city_to_insert: int, solution: List[int],
-                            solution_cost: int, distance_matrix: List[List[int]]) -> int:
+def count_cost_after_repair(index: int, city_to_insert: int, solution: List[int], distance_matrix: List[List[int]]) -> int:
     """
     This function incrementally calculates the updated cost of the solution after
     the insertion of the selected city. Index of the city that is to be inserted
@@ -46,7 +45,7 @@ def greedy_repair(solution: List[int], solution_cost: int, deleted_cities: List[
         for city_index, city in enumerate(deleted_cities):
 
             for insertion_point in range(len(solution)):
-                insertion_cost = count_cost_after_repair(insertion_point, city, solution, solution_cost, distance_matrix)
+                insertion_cost = count_cost_after_repair(insertion_point, city, solution, distance_matrix)
 
                 if insertion_cost < lowest_cost:
                     lowest_cost = insertion_cost
