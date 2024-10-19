@@ -4,10 +4,9 @@ import random
 import sys
 import json
 import time
-from initial_solutions import init_solution_random
-from repair_methods import greedy_repair
-from destroy_logic import destroy_naive
-from repair_methods import count_cost
+from initial_solutions import init_solution_greedy
+from repair_methods import count_cost, greedy_repair
+from destroy_logic import destroy_random, destroy_single_worst_case
 
 
 def read_instance_json(file_path: str):
@@ -27,38 +26,45 @@ def allDifferent(cities: List[int]) -> bool:
     return len(cities) == len(set(cities))
 
 
-def accept(current_solution_cost: int, previous_solution: List[int]
-           , distance_matrix: List[List[int]]):  # accept improving solutions
-    return current_solution_cost < count_cost(previous_solution, distance_matrix)
+def accept(explored_solution_cost: int, current_solution_cost: int):  # accept improving solutions
+    return explored_solution_cost < current_solution_cost
 
 
-def LNS_metaheuristic(instance: json, distance_matrix: List[List[int]]) -> List[int]:
-    city_count: int = len(instance["Coordinates"])
-    initial_solution = init_solution_random(city_count)
-    print("initial solution: ", initial_solution)
+def LNS_metaheuristic(city_count: int, distance_matrix: List[List[int]], steps: int) -> List[int]:
+    curr_solution, curr_solution_cost = init_solution_greedy(city_count, distance_matrix)
+    best_solution, best_solution_cost = curr_solution.copy(), curr_solution_cost
 
-    assert city_count == len(initial_solution)
-    assert allDifferent(initial_solution)
+    assert city_count == len(best_solution)
+    assert allDifferent(best_solution)
 
-    previous_solution = initial_solution
-    best_solution = initial_solution
-    for i in range(200):
-        print(f'{i}.', end=" ")
-        current_solution = previous_solution.copy()
-        deleted_cities = destroy_naive(current_solution, city_count)
-        print("deleted cities: ", deleted_cities)
-        greedy_repair(current_solution, deleted_cities, distance_matrix)
-        print("repaired solution: ", current_solution)
+    for i in range(steps):
+        print(f'{i}.')
+        print(f'current solution ({len(curr_solution)}): ', curr_solution)
+        print("current solution cost: ", curr_solution_cost)
 
-        current_solution_cost = count_cost(current_solution, distance_matrix)
-        print("current solution cost: ", current_solution_cost)
-        if current_solution_cost < count_cost(best_solution, distance_matrix):
-            best_solution = current_solution
-        if accept(current_solution_cost, previous_solution, distance_matrix):
-            previous_solution = current_solution
+        explored_solution = curr_solution.copy()
+        deleted_cities, explored_solution_cost = destroy_random(explored_solution, curr_solution_cost, distance_matrix)
+        print(f'deleted cities ({len(deleted_cities)}): {deleted_cities}')
+        print(f'explored solution ({len(explored_solution)}): ', explored_solution)
+        print("new cost: ", explored_solution_cost)
+        #print("counted cost: ", count_cost(explored_solution, distance_matrix))
+        #print()
+
+        explored_solution_cost = greedy_repair(explored_solution, explored_solution_cost, deleted_cities, distance_matrix)
+        print("repaired solution: ", explored_solution)
+        print("repaired solution cost: ", explored_solution_cost)
+        if explored_solution_cost < best_solution_cost:
+            best_solution = explored_solution
+            best_solution_cost = explored_solution_cost
+        if accept(explored_solution_cost, curr_solution_cost):
+            curr_solution = explored_solution
+            curr_solution_cost = explored_solution_cost
         print()
 
     assert allDifferent(best_solution)
+    print("Best found solution: ", best_solution)
+    print("Best found solution cost = ", count_cost(best_solution, distance_matrix))
+    print()
 
     return best_solution
 
@@ -73,12 +79,15 @@ if __name__ == "__main__":
     output_path = sys.argv[2]
 
     instance = read_instance_json(instance_path)
+    city_count = len(instance["Coordinates"])
     distance_matrix = instance["Matrix"]
+    time_limit = instance['Timeout']
+    start_time = time.time()
 
-    naive_solution = [i for i in range(len(instance['Matrix']))] # TODO - implement something better
-    LNS_solution = LNS_metaheuristic(instance, distance_matrix)
+    LNS_solution = LNS_metaheuristic(city_count, distance_matrix, 2500)
+
     print("GlobalBest: ", instance["GlobalBest"], "GlobalBestVal: ", instance["GlobalBestVal"])
-    print("Cost: ", count_cost(instance["GlobalBest"], distance_matrix))
+    print("Timeout OK: ", time.time() - start_time < time_limit)
 
     write_instance_json(LNS_solution, output_path)
 
