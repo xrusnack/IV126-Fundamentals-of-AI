@@ -1,5 +1,4 @@
 import random
-from itypes import Instance
 from repair_methods import count_cost
 from typing import Tuple, List
 
@@ -40,7 +39,7 @@ def init_solution_greedy(city_count: int, distance_matrix: List[List[int]]) -> T
     return solution, solution_cost
 
 
-def init_solution_greedy_foreach(instance: Instance):
+def init_solution_greedy_foreach():
     """
     Idea to improve basic greedy algo.
     Run it for every city as a starting point and return the best solution.
@@ -48,5 +47,5 @@ def init_solution_greedy_foreach(instance: Instance):
     pass
 
 
-def init_solution_chris_serd_algo(instance: Instance):
+def init_solution_chris_serd_algo():
     pass

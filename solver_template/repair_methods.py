@@ -59,9 +59,3 @@ def greedy_repair(solution: List[int], solution_cost: int, deleted_cities: List[
         deleted_cities.pop(best_deletion)
 
     return solution_cost
-
-
-
-
-
-
