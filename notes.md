@@ -15,3 +15,10 @@ arguments: matrix of the distances
 kubo: destroy, initial sol,
 kaja: repair, cost function, 
 obaja: explore LNS and stopping criteria
+
+
+### Note edge cases
+
+- empty instance
+- instance with single city
+- instance with 2 cities
