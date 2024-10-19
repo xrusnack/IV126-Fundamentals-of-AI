@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, cast
 from itypes import Instance
 import random
 
@@ -15,18 +15,13 @@ def dl_random(solution: List[int], instance: Instance, n: int=5):
 
     # Make sure there is enough "cities" to destroy
     n_to_destroy = min(n, len(solution))
-    sol_copy: List[Optional[int]] = solution.copy()
-    for _ in range(n_to_destroy):
-        available_indices = [city_i for city_i in range(len(sol_copy)) if sol_copy[city_i] is not None]
-        i = random.choice(available_indices)
+    x = random.sample(list(enumerate(solution)), n_to_destroy)
 
-        # assert sol_copy[i] is not None
+    for i, city in x:
+        destroyed_cities.append(city)
+        solution[i] = None
 
-        destroyed_cities.append(sol_copy[i])
-
-        sol_copy[i] = None
-
-    return sol_copy, destroyed_cities
+    return solution, destroyed_cities
 
 
 def dl_single_worst_case(solution: List[int], instance: Instance):
@@ -39,27 +34,24 @@ def dl_single_worst_case(solution: List[int], instance: Instance):
     """
 
     destroyed_city_i = -1
+    destroyed_city = -1
     worst_path_length = -1
 
     for i, city in enumerate(solution):
-        if i == 0:
-            neighbours_indices = [solution[-1], solution[i+1]]
-        elif i == len(solution) - 1:
-            neighbours_indices = [solution[i-1], solution[0]]
-        else:
-            neighbours_indices = [solution[i-1], solution[i+1]]
+        prev = (i + len(solution) - 1) % len(solution)
+        next = (i + 1) % len(solution)
+        neighbours_indices = [solution[prev], solution[next]]
 
         length = (
-            instance["Matrix"][city][neighbours_indices[0]] +
-            instance["Matrix"][city][neighbours_indices[1]]
+            cast(int, instance["Matrix"][city][neighbours_indices[0]]) +
+            cast(int, instance["Matrix"][city][neighbours_indices[1]])
         )
 
         if length > worst_path_length:
             worst_path_length = length
-            destroyed_city_i = city
+            destroyed_city = city
+            destroyed_city_i = i
 
-    city_i = solution.index(destroyed_city_i)
-    sol_copy = solution.copy()
-    sol_copy[city_i] = None
+        solution[destroyed_city_i] = None
 
-    return sol_copy, destroyed_city_i
+    return solution, destroyed_city
