@@ -1,6 +1,7 @@
 import math
 from typing import List
 
+
 def count_cost(solution: List[int], distance_matrix: List[List[int]]) -> int:
     cost = 0
     for i in range(len(solution)):
