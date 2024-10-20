@@ -103,8 +103,8 @@ def _lsn_test(
     assert city_count == len(best_solution)
     assert utils.allDifferent(best_solution)
 
-    # while True:
-    for _ in range(100):
+    while True:
+    # for _ in range(100):
         explored_sol = curr_solution.copy()
 
         # DESTROY
@@ -114,13 +114,11 @@ def _lsn_test(
         # REPAIR
         # explored_sol_cost = repair_methods.random_repair(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
         # explored_sol_cost = repair_methods.greedy_repair(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
-        explored_sol_cost = repair_methods.two_opt(
+        explored_sol = repair_methods.two_opt(
             explored_sol,
-            random.randint(0, len(curr_solution)),
-            random.randint(0, len(curr_solution)),
-            explored_sol_cost,
-            distance_matrix
+            instance["Coordinates"]
         )
+        explored_sol_cost = repair_methods.count_cost(explored_sol, distance_matrix)
 
         if explored_sol_cost < curr_solution_cost:
             best_solution, best_solution_cost = explored_sol.copy(), explored_sol_cost

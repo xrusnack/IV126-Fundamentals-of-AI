@@ -1,5 +1,5 @@
 import math
-from typing import List, Tuple
+from typing import List
 import random
 
 
@@ -82,7 +82,23 @@ def greedy_repair(solution: List[int], solution_cost: int, deleted_cities: List[
     return solution_cost
 
 
-def two_opt_swap(solution: List[int], i_a: int, i_b: int):
+def two_opt_improved(
+    solution: List[int],
+    solution_cost: int,
+    distance_matrix: List[List[int]]):
+    best_solution = solution.copy()
+
+    for i in range(1, len(solution) - 1):
+        for j in range(i + 1, len(solution)):
+            new_cost = two_opt(solution, i, j, solution_cost, distance_matrix)
+            if new_cost < solution_cost:
+                solution_cost = new_cost
+                best_solution = solution.copy()
+    
+    return best_solution, solution_cost
+
+
+def two_opt(solution: List[int], i_a: int, i_b: int, solution_cost: int, distance_matrix: List[List[int]]) -> int:
     """
     Perform a 2-opt move on the route. The move swaps the order of the cities
     between the indices i_a and i_b (inclusive).
@@ -90,35 +106,7 @@ def two_opt_swap(solution: List[int], i_a: int, i_b: int):
 
     solution[i_a:i_b + 1] = solution[i_a:i_b + 1][::-1]
 
+    # Recalculate the cost of the solution
+    solution_cost = count_cost(solution, distance_matrix)
 
-def _euclidean_distance(city_a: int, city_b: int, coords: List[Tuple[float, float]]) -> float:
-    x1, y1 = coords[city_a]
-    x2, y2 = coords[city_b]
-
-    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-
-
-def _distance(route: List[int], coords: List[Tuple[float, float]]) -> float:
-    return sum(_euclidean_distance(route[i], route[i + 1], coords) for i in range(len(route) - 1))
-
-
-def two_opt(
-    solution: List[int],
-    coords: List[Tuple[float, float]],
-):
-    best_solution = solution.copy()
-    best_distance = _distance(best_solution, coords)
-
-    for i in range(1, len(solution) - 1):
-        for j in range(i + 1, len(solution)):
-            # print(i, j)
-            copy = best_solution.copy()
-            two_opt_swap(copy, i, j)
-            print(best_solution, copy)
-            new_distance = _distance(best_solution, coords)
-
-            if new_distance < best_distance:
-                best_distance = new_distance
-                best_solution = copy
-
-    return best_solution
+    return solution_cost
