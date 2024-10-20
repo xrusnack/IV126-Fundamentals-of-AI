@@ -30,7 +30,13 @@ def accept(explored_solution_cost: int, current_solution_cost: int):  # accept i
     return explored_solution_cost < current_solution_cost
 
 
-def LNS_metaheuristic(city_count: int, distance_matrix: List[List[int]], time_limit, start_time, steps=1500) -> List[int]:
+def LNS_metaheuristic(
+    city_count: int,
+    distance_matrix: List[List[int]],
+    time_limit: int,
+    start_time: int,
+    steps: int=1500
+) -> List[int]:
     curr_solution, curr_solution_cost = init_solution_greedy(city_count, distance_matrix)
     best_solution, best_solution_cost = curr_solution.copy(), curr_solution_cost
 
