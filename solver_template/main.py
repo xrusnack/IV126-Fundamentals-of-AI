@@ -7,6 +7,7 @@ import time
 from initial_solutions import init_solution_greedy
 from repair_methods import count_cost, greedy_repair
 from destroy_logic import destroy_random, destroy_n_worst_cases
+import utils
 
 
 def read_instance_json(file_path: str):
@@ -22,14 +23,6 @@ def write_instance_json(solution: List[int], file_path: str) -> None:
         json.dump(solution, f)
 
 
-def allDifferent(cities: List[int]) -> bool:
-    return len(cities) == len(set(cities))
-
-
-def accept(explored_solution_cost: int, current_solution_cost: int):  # accept improving solutions
-    return explored_solution_cost < current_solution_cost
-
-
 def LNS_metaheuristic(
     city_count: int,
     distance_matrix: List[List[int]],
@@ -41,7 +34,7 @@ def LNS_metaheuristic(
     best_solution, best_solution_cost = curr_solution.copy(), curr_solution_cost
 
     assert city_count == len(best_solution)
-    assert allDifferent(best_solution)
+    assert utils.allDifferent(best_solution)
 
     for _ in range(steps):
         print(f'current solution ({len(curr_solution)}): ', curr_solution)
@@ -64,7 +57,7 @@ def LNS_metaheuristic(
         if explored_solution_cost < best_solution_cost:
             best_solution = explored_solution
             best_solution_cost = explored_solution_cost
-        if accept(explored_solution_cost, curr_solution_cost):
+        if utils.accept(explored_solution_cost, curr_solution_cost):
             curr_solution = explored_solution
             curr_solution_cost = explored_solution_cost
         curr_time = time.time() - start_time
@@ -73,7 +66,7 @@ def LNS_metaheuristic(
             break
         print()
 
-    assert allDifferent(best_solution)
+    assert utils.allDifferent(best_solution)
     print("Best found solution: ", best_solution)
     print("Best found solution cost = ", count_cost(best_solution, distance_matrix))
     print()
