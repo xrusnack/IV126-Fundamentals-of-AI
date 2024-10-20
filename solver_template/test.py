@@ -3,6 +3,8 @@ import os
 import json
 import time
 import logging
+import math
+import random
 
 import matplotlib.pyplot as plt
 
@@ -35,7 +37,10 @@ def _plot_route(
 
 def _plot_cities(coords: List[Tuple[float, float]]):
     x, y = zip(*coords)
+
     plt.scatter(x, y, color='red', zorder=1000)
+    for i, coord in enumerate(coords):
+        plt.text(coord[0] + 0.2, coord[1] - 0.7, f"{i}", fontsize=8, color="purple", zorder=1000)  # f"{coords[0]:.2f}, {coords[1]:.2f}"
 
 
 def _plot_solution(
@@ -45,7 +50,7 @@ def _plot_solution(
 ):
     plt.cla()
 
-    a = -1
+    a = math.inf
     b = -1
 
     if solution:
@@ -89,27 +94,40 @@ def _lsn_test(
     start_time = time.time()
     prev_time = start_time
 
-    # curr_solution, curr_solution_cost = initial_solutions.init_solution_greedy(city_count, distance_matrix)
+    # INIT SOL
     curr_solution, curr_solution_cost = initial_solutions.init_solution_random(city_count, distance_matrix)
+    # curr_solution, curr_solution_cost = initial_solutions.init_solution_greedy(city_count, distance_matrix)
+
     best_solution, best_solution_cost = curr_solution.copy(), curr_solution_cost
 
     assert city_count == len(best_solution)
     assert utils.allDifferent(best_solution)
 
-    while True:
-    # for _ in range(100):
+    # while True:
+    for _ in range(100):
         explored_sol = curr_solution.copy()
 
-        deleted_cities, explored_sol_cost = destroy_logic.destroy_random(explored_sol, curr_solution_cost, distance_matrix)
-        # deleted_cities, explored_sol_cost = destroy_logic.destroy_n_worst_cases(explored_sol, curr_solution_cost, 1, distance_matrix)
-        
-        explored_sol_cost = repair_methods.greedy_repair(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
-        
+        # DESTROY
+        # deleted_cities, explored_sol_cost = destroy_logic.destroy_random(explored_sol, curr_solution_cost, distance_matrix)
+        # deleted_cities, explored_sol_cost = destroy_logic.destroy_n_worst_cases(explored_sol, curr_solution_cost, 2, distance_matrix)
+        explored_sol_cost = 1000
+        # REPAIR
+        # explored_sol_cost = repair_methods.random_repair(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
+        # explored_sol_cost = repair_methods.greedy_repair(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
+        explored_sol_cost = repair_methods.two_opt(
+            explored_sol,
+            random.randint(0, len(curr_solution)),
+            random.randint(0, len(curr_solution)),
+            explored_sol_cost,
+            distance_matrix
+        )
+
         if explored_sol_cost < curr_solution_cost:
             best_solution, best_solution_cost = explored_sol.copy(), explored_sol_cost
         
         if utils.accept(explored_sol_cost, curr_solution_cost):
             curr_solution, curr_solution_cost = explored_sol.copy(), explored_sol_cost
+            LOG.info("Improving!")
 
         curr_time = time.time()
         if curr_time - prev_time > 5:
@@ -122,6 +140,8 @@ def _lsn_test(
 
 
         _plot_solution(instance["Coordinates"], (best_solution, best_solution_cost), (instance["GlobalBest"], instance["GlobalBestVal"]))
+
+    assert utils.allDifferent(best_solution)
 
     return best_solution, best_solution_cost
 
@@ -160,7 +180,7 @@ def _run():
     instances = _load_instances()
 
     # _run_all(instances)
-    which = "tsp_150.json"
+    which = "tsp_22.json"
     sol = _run_single(which, instances[which])
 
 

@@ -68,3 +68,9 @@ def destroy_n_worst_cases(solution: List[int], solution_cost: int, n: int,
     new_cost = count_cost_after_destroy(del_indices, solution, solution_cost, distance_matrix)
 
     return del_cities, new_cost
+
+
+def find_crossing_path(
+        
+):
+    pass

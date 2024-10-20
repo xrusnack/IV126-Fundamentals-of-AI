@@ -1,5 +1,6 @@
 import math
 from typing import List
+import random
 
 
 def count_cost(solution: List[int], distance_matrix: List[List[int]]) -> int:
@@ -25,6 +26,26 @@ def count_cost_after_repair(index: int, city_to_insert: int, solution: List[int]
                       distance_matrix[city_to_insert][succ] -
                       distance_matrix[pred][succ])
     return insertion_cost
+
+
+def random_repair(
+    solution: List[int],
+    solution_cost: int,
+    deleted_cities: List[int],
+    distance_matrix: List[List[int]]) -> int:
+    """
+    """
+
+    while deleted_cities:
+        city = deleted_cities.pop()
+
+        index = random.randint(0, len(solution))
+        insertion_cost = count_cost_after_repair(index, city, solution, distance_matrix)
+
+        solution.insert(index, city)
+        solution_cost += insertion_cost
+    
+    return solution_cost
 
 
 def greedy_repair(solution: List[int], solution_cost: int, deleted_cities: List[int],
@@ -57,5 +78,21 @@ def greedy_repair(solution: List[int], solution_cost: int, deleted_cities: List[
         solution.insert(best_insertion[0], best_insertion[1])
         solution_cost += best_insertion_cost
         deleted_cities.pop(best_deletion)
+
+    return solution_cost
+
+
+def two_opt(solution: List[int], i_a: int, i_b: int, solution_cost: int, distance_matrix: List[List[int]]) -> int:
+    """
+    Perform a 2-opt move on the route. The move swaps the order of the cities
+    between the indices i_a and i_b (inclusive).
+
+    Returns: The new route after the 2-opt move.
+    """
+
+    solution[i_a:i_b + 1] = solution[i_a:i_b + 1][::-1]
+
+    # Recalculate the cost of the solution
+    solution_cost = count_cost(solution, distance_matrix)
 
     return solution_cost
