@@ -11,7 +11,7 @@ class LNSSolver:
     def __init__(self, distance_matrix: List[List[float]], time_limit: float, start_time: float, alpha = 0.997):
         self.distance_matrix = distance_matrix
         self.city_count = len(distance_matrix[0])
-        self.T_initial = math.sqrt(self.city_count)
+        self.T_initial = 5000
         self.alpha = alpha
         self.time_limit = time_limit
         self.start_time = start_time
