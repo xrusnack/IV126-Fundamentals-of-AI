@@ -1,6 +1,8 @@
 import math
 from typing import List, Tuple
 import random
+import itertools
+
 
 
 def count_cost(solution: List[int], distance_matrix: List[List[int]]) -> int:
@@ -22,10 +24,7 @@ def count_cost_after_repair(index: int, city_to_insert: int, solution: List[int]
     pred = solution[(index - 1) % len(solution)]
     succ = solution[index % len(solution)]
 
-    insertion_cost = (distance_matrix[pred][city_to_insert] +
-                      distance_matrix[city_to_insert][succ] -
-                      distance_matrix[pred][succ])
-    return insertion_cost
+    return distance_matrix[pred][city_to_insert] + distance_matrix[city_to_insert][succ] - distance_matrix[pred][succ]
 
 
 def random_repair(
@@ -82,7 +81,7 @@ def greedy_repair(solution: List[int], solution_cost: int, deleted_cities: List[
     return solution_cost
 
 
-def two_opt_swap(solution: List[int], i_a: int, i_b: int):
+def two_opt_swap_(solution: List[int], i_a: int, i_b: int):
     """
     Perform a 2-opt move on the route. The move swaps the order of the cities
     between the indices i_a and i_b (inclusive).
@@ -102,7 +101,7 @@ def _distance(route: List[int], coords: List[Tuple[float, float]]) -> float:
     return sum(_euclidean_distance(route[i], route[i + 1], coords) for i in range(len(route) - 1))
 
 
-def two_opt(
+def two_opt_(
     solution: List[int],
     coords: List[Tuple[float, float]],
 ):
@@ -122,3 +121,55 @@ def two_opt(
                 best_solution = copy
 
     return best_solution
+
+
+def count_cost_after_swapping(solution: List[int], solution_cost: int, edge_indices: Tuple[int, int],
+                              distance_matrix: List[List[int]]) -> int:
+    """
+    This function incrementally computes the new cost of the solution
+    after reversing the order of values in the list solution between
+    the edge_indices (2-opt operation).
+    """
+
+    first: int = edge_indices[0]
+    last: int = edge_indices[1]
+
+    reverse_cost = solution_cost
+    reverse_cost -= distance_matrix[solution[first]][solution[(first + 1) % len(solution)]]
+    reverse_cost -= distance_matrix[solution[last]][solution[(last + 1) % len(solution)]]
+    reverse_cost += distance_matrix[solution[first]][solution[last]]
+    reverse_cost += distance_matrix[solution[(first + 1) % len(solution)]][solution[(last + 1) % len(solution)]]
+
+    return reverse_cost
+
+
+def two_opt_swap(solution: List[int], i_a: int, i_b: int) -> None:
+    """
+    This function performs a 2-opt swap on the given solution - it reverses the order
+    of the elements between the indices i_a and i_b. It is a helper function for 2-opt.
+    """
+    middle = (abs(i_a - i_b) + 1) // 2
+    for _ in range(middle):
+        solution[i_a], solution[i_b] = solution[i_b], solution[i_a]
+        i_a += 1
+        i_b -= 1
+
+
+def two_opt(solution: List[int], solution_cost: int, distance_matrix: List[List[int]]) -> int:
+    """
+    This function iteratively examines all possible pairs of edges in the solution
+    to identify the best swap (of 2 edges) that results in the lowest cost.
+    It applies the swap and returns the updated cost of the solution.
+    """
+    best_solution_cost = solution_cost
+    best_swap_indices = (0, 0)
+
+    for edge_indices in itertools.combinations(range(len(solution)), 2):
+        reversed_cost = count_cost_after_swapping(solution, solution_cost, edge_indices, distance_matrix)
+        if reversed_cost < best_solution_cost:
+            best_swap_indices = ((edge_indices[0] + 1) % len(solution), edge_indices[1])
+            best_solution_cost = reversed_cost
+    two_opt_swap(solution, best_swap_indices[0], best_swap_indices[1])
+
+    return best_solution_cost
+
