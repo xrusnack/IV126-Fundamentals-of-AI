@@ -4,7 +4,7 @@ import time
 import random
 from initial_solutions import InitialSolutions
 from repair_methods import RepairMethods
-from destroy_logic import DestroyMethods
+from destroy_methods import DestroyMethods
 
 
 class LNSSolver:
@@ -24,6 +24,9 @@ class LNSSolver:
         """
         This method is a LNS metaheuristic with a simulated annealing approach to accepting new solutions.
         """
+        if not self.city_count > 0:
+            return
+
         curr_solution, curr_solution_cost = InitialSolutions.greedy(self.city_count, self.distance_matrix)
 
         self.best_solution = curr_solution.copy()
