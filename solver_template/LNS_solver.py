@@ -63,4 +63,5 @@ class LNSSolver:
         assert len(self.best_solution) == len(set(self.best_solution))
 
         print("Best found solution: ", self.best_solution)
-        print("Best found solution cost = ", RepairMethods.count_cost_trivial(self.best_solution, self.distance_matrix))
+        print("Best found solution cost = ", self.best_solution_cost)
+        print("Best found solution cost counted = ", RepairMethods.count_cost_trivial(self.best_solution, self.distance_matrix))
