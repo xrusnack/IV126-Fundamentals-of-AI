@@ -8,7 +8,7 @@ from destroy_methods import DestroyMethods
 
 
 class LNSSolver:
-    def __init__(self, distance_matrix: List[List[float]], time_limit: float, start_time: float, alpha = 0.997):
+    def __init__(self, distance_matrix: List[List[float]], time_limit: float, start_time: float, alpha: float = 0.997):
         self.distance_matrix = distance_matrix
         self.city_count = len(distance_matrix[0])
         self.T_initial = 6000
@@ -32,7 +32,7 @@ class LNSSolver:
         self.best_solution = curr_solution.copy()
         self.best_solution_cost = curr_solution_cost
 
-        T = self.T_initial  # initialize the temperature
+        temperature = self.T_initial  # initialize the temperature
         while True:  # timelimit is the stopping condition
             explored_solution = curr_solution.copy()
             deleted_cities, explored_solution_cost = DestroyMethods.random(explored_solution, curr_solution_cost,
@@ -50,11 +50,11 @@ class LNSSolver:
             if delta_cost < 0:
                 curr_solution, curr_solution_cost = explored_solution.copy(), explored_solution_cost
             else:
-                acceptance_prob= math.exp(-delta_cost / T)
+                acceptance_prob= math.exp(-delta_cost / temperature)
                 if random.random() < acceptance_prob:
                     curr_solution, curr_solution_cost = explored_solution.copy(), explored_solution_cost
 
-            T *= self.alpha  # cool the temperature
+            temperature *= self.alpha  # cool the temperature
 
             curr_time = time.time() - self.start_time
             if curr_time >= self.time_limit:

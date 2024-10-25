@@ -13,7 +13,8 @@ class InitialSolutions:
         """
         cities = list(range(city_count))
         random.shuffle(cities)
-        cost = RepairMethods.count_cost(cities, distance_matrix)
+        cost = RepairMethods.count_cost_trivial(cities, distance_matrix)
+
         return cities, cost
 
 
@@ -29,7 +30,7 @@ class InitialSolutions:
         current_city = unvisited.pop()
 
         solution = [current_city]
-        solution_cost = 0
+        solution_cost: float = 0
 
         while unvisited:
             next_city = min(unvisited, key=lambda city: distance_matrix[current_city][city])

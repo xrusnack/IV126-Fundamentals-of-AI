@@ -64,7 +64,7 @@ class DestroyMethods:
             neighbor_lengths[i] = distance_matrix[city][solution[prev]] + distance_matrix[city][solution[next]]
 
         sorted_lengths = sorted(neighbor_lengths.items(), key=lambda item: item[1], reverse=True)
-        del_indices = [city_index for city_index, value in sorted_lengths[:n]]
+        del_indices = [city_index for city_index, _ in sorted_lengths[:n]]
         del_cities = [solution[i] for i in del_indices]
         new_cost = DestroyMethods.count_cost(del_indices, solution, solution_cost, distance_matrix)
 
