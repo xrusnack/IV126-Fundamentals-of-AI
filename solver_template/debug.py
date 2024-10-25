@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from initial_solutions import InitialSolutions
 from destroy_methods import DestroyMethods
 from repair_methods import RepairMethods
+from optimizer import Optimizer
 
 
 from typing import Dict, List, Literal
@@ -80,7 +81,7 @@ def _plot_solution(
         _plot_route(coords, solution[0])
     if global_best:
         b = global_best[1]
-        _plot_route(coords, global_best[0], color="green", zorder=50, linestyle="--")
+        _plot_route(coords, global_best[0], color="orange", zorder=101, linestyle="--")
     
     _plot_cities(coords)
 
@@ -111,6 +112,8 @@ def _lsn_test(
     instance: Instance,
     timeout: int,
 ):
+    optimizer = Optimizer()
+
     coords = cast(Coordinates, instance["Coordinates"])
     city_count = len(coords)
     global_best = cast(Solution, instance["GlobalBest"])
@@ -122,7 +125,8 @@ def _lsn_test(
 
     # INIT SOL
     # curr_solution, curr_solution_cost = InitialSolutions.random(city_count, distance_matrix)
-    curr_solution, curr_solution_cost = InitialSolutions.greedy(city_count, distance_matrix)
+    # curr_solution, curr_solution_cost = InitialSolutions.greedy(city_count, distance_matrix)
+    curr_solution, curr_solution_cost = optimizer.initial(city_count, distance_matrix)
 
     best_solution, best_solution_cost = curr_solution.copy(), curr_solution_cost
 
@@ -134,20 +138,26 @@ def _lsn_test(
         explored_sol = curr_solution.copy()
 
         # DESTROY
-        deleted_cities, explored_sol_cost = DestroyMethods.random(explored_sol, curr_solution_cost, distance_matrix)
+        # deleted_cities, explored_sol_cost = DestroyMethods.random(explored_sol, curr_solution_cost, distance_matrix)
         # deleted_cities, explored_sol_cost = DestroyMethods.n_worst_cases(explored_sol, curr_solution_cost, 2, distance_matrix)
-        # REPAIR
-        explored_sol_cost = RepairMethods.greedy(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
-        # explored_sol_cost = RepairMethods.greedy(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
-        explored_sol_cost = RepairMethods.two_opt(explored_sol, explored_sol_cost, distance_matrix)
+        # deleted_cities, explored_sol_cost = DestroyMethods.shaw_removal(explored_sol, curr_solution_cost, distance_matrix)
+        deleted_cities, explored_sol_cost = optimizer.destroy(explored_sol, curr_solution_cost, distance_matrix)
 
+        # LOG.info(f"Deleted cities: {deleted_cities}")
+        # REPAIR
+        # explored_sol_cost = RepairMethods.greedy(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
+        # explored_sol_cost = RepairMethods.greedy(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
+        explored_sol_cost = optimizer.repair(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
+        # explored_sol_cost = RepairMethods.two_opt(explored_sol, explored_sol_cost, distance_matrix)
         
         if explored_sol_cost < curr_solution_cost:
             best_solution, best_solution_cost = explored_sol.copy(), explored_sol_cost
         
         if _accept(explored_sol_cost, curr_solution_cost):
             curr_solution, curr_solution_cost = explored_sol.copy(), explored_sol_cost
-            LOG.info("Improving!")
+            optimizer.improved()
+        else:
+            optimizer.steps_not_improved += 1
 
         curr_time = time.time()
         if curr_time - prev_time > 5:
@@ -203,7 +213,8 @@ def _run():
     instances = _load_instances()
 
     # _run_all(instances)
-    which = "tsp_76.json"
+
+    which = "tsp_202.json"
     _ = _run_single(which, instances[which])
 
 
