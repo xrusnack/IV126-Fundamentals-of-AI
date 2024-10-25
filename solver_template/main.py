@@ -2,8 +2,7 @@ from typing import List
 import os
 import sys
 import json
-import time
-from LNS_solver import LNSSolver
+from solver_template.lns_solver import LNSSolver
 
 
 def read_instance_json(file_path: str):
@@ -34,18 +33,3 @@ if __name__ == "__main__":
     print("GlobalBest: ", instance["GlobalBest"], "GlobalBestVal: ", instance["GlobalBestVal"])
 
     write_instance_json(LNS_solver.best_solution, output_path)
-
-
-#######################################################################
-# Example of the required timeout mechanism within the LNS structure: #
-#######################################################################
-# ...
-# time_limit = instance['Timeout']
-# start_time = time.time()
-# for iteration in range(9999999999):
-#     ...logic of one search iteration...
-#     if time.time() - start_time >= time_limit:
-#         break
-# ...
-#######################################################################
-#######################################################################
