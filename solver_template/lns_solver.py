@@ -4,6 +4,7 @@ import time
 import random
 import logging
 
+from utils import write_instance_json
 from initial_solutions import InitialSolutions
 from repair_methods import RepairMethods
 from destroy_methods import DestroyMethods
@@ -14,10 +15,12 @@ logging.basicConfig(level=logging.INFO, format='[%(asctime)s][%(levelname)-5.5s]
 
 
 class LNSSolver:
-    def __init__(self,
-                 distance_matrix: List[List[float]],
-                 time_limit: float,
-                 alpha: float = 0.997
+    def __init__(
+        self,
+        distance_matrix: List[List[float]],
+        time_limit: float,
+        output_path: str,
+        alpha: float = 0.997
     ):
         self.distance_matrix = distance_matrix
         self.city_count = len(distance_matrix[0])
@@ -25,6 +28,7 @@ class LNSSolver:
         self.alpha = alpha
         self.time_limit = time_limit
         self.start_time = math.inf 
+        self.output_path = output_path
 
         self.best_solution = list(range(self.city_count))
         self.best_solution_cost = float('inf')
@@ -67,6 +71,10 @@ class LNSSolver:
             if explored_solution_cost < self.best_solution_cost:
                 self.best_solution = explored_solution.copy()
                 self.best_solution_cost = explored_solution_cost
+
+                # Checkpoint the best solution
+                write_instance_json(self.best_solution, self.output_path)
+
 
             # Accept the new, improving solution
             delta_cost = explored_solution_cost - curr_solution_cost
