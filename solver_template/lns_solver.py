@@ -45,6 +45,11 @@ class LNSSolver:
         self.start_time = time.time()
         delta_time = time.time() - self.start_time
 
+        # Sanity check
+        if self.city_count <= 6:
+            self.best_solution, self.best_solution_cost = InitialSolutions.brute_force(self.distance_matrix)
+            delta_time = math.inf
+
         curr_solution, curr_solution_cost = InitialSolutions.greedy(
             self.city_count, self.distance_matrix
         )
@@ -89,6 +94,6 @@ class LNSSolver:
 
         assert len(self.best_solution) == len(set(self.best_solution))
 
-        LOG.info("Best found solution: ", self.best_solution)
-        LOG.info("Best found solution cost = ", self.best_solution_cost)
-        LOG.info("Best found solution cost counted = ", RepairMethods.count_cost_trivial(self.best_solution, self.distance_matrix))
+        LOG.info(f"Best found solution: {self.best_solution}")
+        LOG.info(f"Best found solution cost = {self.best_solution_cost}")
+        LOG.info(f"Best found solution cost counted = {RepairMethods.count_cost_trivial(self.best_solution, self.distance_matrix)}")

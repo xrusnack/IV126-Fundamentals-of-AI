@@ -1,5 +1,5 @@
 import sys
-from solver_template.lns_solver import LNSSolver
+from lns_solver import LNSSolver
 
 from utils import read_instance_json, write_instance_json
 
