@@ -2,9 +2,15 @@ from typing import List
 import math
 import time
 import random
+import logging
+
 from initial_solutions import InitialSolutions
 from repair_methods import RepairMethods
 from destroy_methods import DestroyMethods
+
+
+LOG = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='[%(asctime)s][%(levelname)-5.5s][%(name)-.20s] %(message)s')
 
 
 class LNSSolver:
@@ -62,6 +68,6 @@ class LNSSolver:
 
         assert len(self.best_solution) == len(set(self.best_solution))
 
-        print("Best found solution: ", self.best_solution)
-        print("Best found solution cost = ", self.best_solution_cost)
-        print("Best found solution cost counted = ", RepairMethods.count_cost_trivial(self.best_solution, self.distance_matrix))
+        LOG.info("Best found solution: ", self.best_solution)
+        LOG.info("Best found solution cost = ", self.best_solution_cost)
+        LOG.info("Best found solution cost counted = ", RepairMethods.count_cost_trivial(self.best_solution, self.distance_matrix))
