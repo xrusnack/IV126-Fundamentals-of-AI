@@ -28,7 +28,7 @@ if __name__ == "__main__":
     output_path = sys.argv[2]
 
     instance = read_instance_json(instance_path)
-    LNS_solver: LNSSolver = LNSSolver(instance["Matrix"], instance['Timeout'], time.time())
+    LNS_solver: LNSSolver = LNSSolver(instance["Matrix"], instance['Timeout'])
     LNS_solver.solve()
 
     print("GlobalBest: ", instance["GlobalBest"], "GlobalBestVal: ", instance["GlobalBestVal"])
