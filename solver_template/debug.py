@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Optional, cast
+from typing import List, Dict, Tuple, Optional, cast, Literal
 import os
 import json
 import time
@@ -7,13 +7,7 @@ import math
 
 import matplotlib.pyplot as plt
 
-from initial_solutions import InitialSolutions
-from destroy_methods import DestroyMethods
-from repair_methods import RepairMethods
 from optimizer import Optimizer
-
-
-from typing import Dict, List, Literal
 
 Root = Literal["Coordinates"] \
     | Literal["Matrix"] \
@@ -124,8 +118,6 @@ def _lsn_test(
     prev_time = start_time
 
     # INIT SOL
-    # curr_solution, curr_solution_cost = InitialSolutions.random(city_count, distance_matrix)
-    # curr_solution, curr_solution_cost = InitialSolutions.greedy(city_count, distance_matrix)
     curr_solution, curr_solution_cost = optimizer.initial(city_count, distance_matrix)
 
     best_solution, best_solution_cost = curr_solution.copy(), curr_solution_cost
@@ -138,17 +130,9 @@ def _lsn_test(
         explored_sol = curr_solution.copy()
 
         # DESTROY
-        # deleted_cities, explored_sol_cost = DestroyMethods.random(explored_sol, curr_solution_cost, distance_matrix)
-        # deleted_cities, explored_sol_cost = DestroyMethods.n_worst_cases(explored_sol, curr_solution_cost, 2, distance_matrix)
-        # deleted_cities, explored_sol_cost = DestroyMethods.shaw_removal(explored_sol, curr_solution_cost, distance_matrix)
         deleted_cities, explored_sol_cost = optimizer.destroy(explored_sol, curr_solution_cost, distance_matrix)
-
-        # LOG.info(f"Deleted cities: {deleted_cities}")
         # REPAIR
-        # explored_sol_cost = RepairMethods.greedy(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
-        # explored_sol_cost = RepairMethods.greedy(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
         explored_sol_cost = optimizer.repair(explored_sol, explored_sol_cost, deleted_cities, distance_matrix)
-        # explored_sol_cost = RepairMethods.two_opt(explored_sol, explored_sol_cost, distance_matrix)
         
         if explored_sol_cost < curr_solution_cost:
             best_solution, best_solution_cost = explored_sol.copy(), explored_sol_cost

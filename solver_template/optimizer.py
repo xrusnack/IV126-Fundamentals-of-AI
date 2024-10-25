@@ -1,6 +1,5 @@
 from typing import List, Callable, Tuple
 import logging
-import random
 
 from initial_solutions import InitialSolutions
 from destroy_methods import DestroyMethods
@@ -55,13 +54,13 @@ class Optimizer:
             DestroyMethods.shaw_removal
         ]
         self.repair_methods: List[RepairMethod] = [
-            RepairMethods.random,
+            # RepairMethods.random,
             RepairMethods.greedy,
         ]
         
         self.current_init_method: int = 1
         self.current_destroy_method: int = 2
-        self.current_repair_method: int = 1
+        self.current_repair_method: int = 0
         self.use_two_opt = False
     
     def initial(self, city_count: int, distance_matrix: List[List[float]]):
