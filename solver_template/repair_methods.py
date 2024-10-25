@@ -11,7 +11,7 @@ class RepairMethods:
         solution_cost: float,
         deleted_cities: List[int],
         distance_matrix: List[List[float]],
-    ) -> Tuple[List[int], float]:
+    ) -> float:
         """
         Very primitive repair method - randomly inserts deleted cities back into the solution.
 
@@ -28,7 +28,7 @@ class RepairMethods:
             solution.insert(index, city)
             solution_cost += insertion_cost
 
-        return solution, solution_cost
+        return solution_cost
     
 
     @staticmethod
