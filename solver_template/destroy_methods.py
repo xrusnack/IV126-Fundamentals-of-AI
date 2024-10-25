@@ -47,8 +47,12 @@ class DestroyMethods:
 
 
     @staticmethod
-    def n_worst_cases(solution: List[int], solution_cost: float, n: int,
-                                  distance_matrix: List[List[float]]) -> Tuple[List[int], float]:
+    def n_worst_cases(
+        solution: List[int],
+        solution_cost: float,
+        distance_matrix: List[List[float]],
+        n: int=5
+    ) -> Tuple[List[int], float]:
         """
         This method removes the specified number of cities based on the distance matrix
         and returns a tuple (list of destroyed cities, new solution cost).
@@ -69,3 +73,57 @@ class DestroyMethods:
         new_cost = DestroyMethods.count_cost(del_indices, solution, solution_cost, distance_matrix)
 
         return del_cities, new_cost
+
+    @staticmethod
+    def shaw_removal(
+        solution: List[int],
+        solution_cost: float,
+        distance_matrix: List[List[float]],
+        alpha: float=10,
+        limit: int=10
+    ) -> Tuple[List[int], float]:
+        """
+        """
+        assert len(solution) > 3
+
+        # Setup reference values
+        seed_city_i = random.randint(0, len(solution) - 1)
+        seed_city_prev_i = (seed_city_i - 1) % len(solution)
+        seed_city_next_i = (seed_city_i + 1) % len(solution)
+        seed_city = solution[seed_city_i]
+        seed_city_sum_distance = (
+            distance_matrix[seed_city][solution[seed_city_prev_i]]
+            + distance_matrix[seed_city][solution[seed_city_next_i]]
+        )
+
+        related_cities: List[Tuple[int, int, float]] = []
+
+        # Calculate related cities
+        for city_i, city in enumerate(solution):
+            if city == seed_city:
+                continue
+
+            city_prev_i = (city_i - 1) % len(solution)
+            city_next_i = (city_i + 1) % len(solution)
+            city_sum_distance = (
+                distance_matrix[city][solution[city_prev_i]]
+                + distance_matrix[city][solution[city_next_i]]
+            )
+            related_cities.append((
+                city,
+                city_i,
+                abs(city_sum_distance - seed_city_sum_distance),
+            ))
+        related_cities.sort(key=lambda x: x[2], reverse=True)
+
+        deleted_cities: List[int] = [seed_city]
+        deleted_cities_i: List[int] = [seed_city_i]
+
+        popped = related_cities.pop()
+        while limit > 0 and popped[2] < alpha:
+            deleted_cities.append(popped[0])
+            deleted_cities_i.append(popped[1])
+            limit -= 1
+            popped = related_cities.pop()
+
+        return deleted_cities, DestroyMethods.count_cost(deleted_cities_i, solution, solution_cost, distance_matrix)
