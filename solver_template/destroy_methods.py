@@ -2,6 +2,36 @@ import random
 from typing import List, Tuple, Dict
 
 
+def _calc_sum_distance(city_i: int, solution: List[int], distance_matrix: List[List[float]]) -> float:
+    city = solution[city_i]
+    prev = solution[(city_i - 1) % len(solution)]
+    next = solution[(city_i + 1) % len(solution)]
+
+    return distance_matrix[city][prev] + distance_matrix[city][next]
+
+
+def _calculate_related_cities(
+    seed_city: int,
+    seed_city_sum_distance: float,
+    solution: List[int],
+    distance_matrix: List[List[float]]
+):
+    related_cities: List[Tuple[int, int, float]] = []
+    
+    for city_i, city in enumerate(solution):
+        if city == seed_city:
+            continue
+
+        city_sum_distance = _calc_sum_distance(city_i, solution, distance_matrix)
+        related_cities.append((
+            city,
+            city_i,
+            abs(city_sum_distance - seed_city_sum_distance),
+        ))
+
+    return sorted(related_cities, key=lambda x: x[2], reverse=True)
+
+
 class DestroyMethods:
     @staticmethod
     def count_cost(del_indices: List[int], solution: List[int], solution_cost: float,
@@ -83,38 +113,25 @@ class DestroyMethods:
         alpha: float=200
     ) -> Tuple[List[int], float]:
         """
+        Implemention of shaw removal algorithm.
+        
+        It randomly selects a city and removes the n cities with the most similar
+        distance to their neighbors. The alpha parameter is used to determine the
+        similarity.
         """
         assert len(solution) > 3
 
         # Setup reference values
         seed_city_i = random.randint(0, len(solution) - 1)
-        seed_city_prev_i = (seed_city_i - 1) % len(solution)
-        seed_city_next_i = (seed_city_i + 1) % len(solution)
         seed_city = solution[seed_city_i]
-        seed_city_sum_distance = (
-            distance_matrix[seed_city][solution[seed_city_prev_i]]
-            + distance_matrix[seed_city][solution[seed_city_next_i]]
+        seed_city_sum_distance = _calc_sum_distance(seed_city_i, solution, distance_matrix)
+
+        related_cities = _calculate_related_cities(
+            seed_city,
+            seed_city_sum_distance,
+            solution,
+            distance_matrix
         )
-
-        related_cities: List[Tuple[int, int, float]] = []
-
-        # Calculate related cities
-        for city_i, city in enumerate(solution):
-            if city == seed_city:
-                continue
-
-            city_prev_i = (city_i - 1) % len(solution)
-            city_next_i = (city_i + 1) % len(solution)
-            city_sum_distance = (
-                distance_matrix[city][solution[city_prev_i]]
-                + distance_matrix[city][solution[city_next_i]]
-            )
-            related_cities.append((
-                city,
-                city_i,
-                abs(city_sum_distance - seed_city_sum_distance),
-            ))
-        related_cities.sort(key=lambda x: x[2], reverse=True)
 
         deleted_cities: List[int] = [seed_city]
         deleted_cities_i: List[int] = [seed_city_i]
