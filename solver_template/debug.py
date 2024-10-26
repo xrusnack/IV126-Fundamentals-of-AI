@@ -103,6 +103,21 @@ def _load_instances() -> Dict[str, Instance]:
     return instances
 
 
+def _print_stats(rows: List[Tuple[str, float, float]]):
+    col_widths = [20, 20, 20, 10]
+    headers = ["Name", "Found cost", "Global best cost", "Delta"]
+    
+    print("-" * (sum(col_widths) + 9))
+    print(f"{' | '.join([f'{header:<{col_widths[i]}}' for i, header in enumerate(headers)])}")
+    print("-" * (sum(col_widths) + 9))
+    
+    for row in rows:
+        row = (row[0], row[1], row[2], row[1] - row[2]) # type: ignore
+
+        float_columns = [f"{value:>{col_widths[i+1]}.2f}" for i, value in enumerate(row[1:])]
+        print(f"{row[0]:<{col_widths[0]}} | " + " | ".join(float_columns))
+
+
 def _lsn_test(
     instance: Instance,
     timeout: int
@@ -193,17 +208,26 @@ def _run_single(name: str, instance: Instance, block: bool =False):
     _plot_solution(coords, (best_solution, best_solution_cost), (global_best, global_best_val))
     plt.show(block=block) # type: ignore
 
-    plt.plot(optimizer.cost, label="Cost")
-    plt.show(block=block) # type: ignore
+    # plt.plot(optimizer.cost, label="Cost") # type: ignore
+    # plt.show(block=block) # type: ignore
 
-    return best_solution
+    return best_solution, best_solution_cost, optimizer.cost
 
 
 def _run_all(instances: Dict[str, Instance]):
-    for name, instance in instances.items():
-        _run_single(name, instance)
+    stats: List[Tuple[str, float, float]] = []
+
+    for _ in range(3):
+        for name, instance in instances.items():
+            stat = _run_single(name, instance)
+
+            stats.append((name, stat[1], cast(float, instance["GlobalBestVal"])))
     
     LOG.info("All instances processed.")
+
+    stats.sort(key=lambda x: x[0])
+
+    _print_stats(stats)
 
 
 def _run():
