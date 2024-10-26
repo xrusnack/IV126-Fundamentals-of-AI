@@ -8,6 +8,9 @@ logging.basicConfig(level=logging.INFO, format='[%(asctime)s][%(levelname)-5.5s]
 def _test_a():
     assert True == True
 
+    # Tests were not pushed to the repository on purpose
+    # as each of the authors uses different IDE and workflow
+
 
 def _enumerate():
     LOG.info("Starting tests...")
