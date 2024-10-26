@@ -89,7 +89,6 @@ class LNSSolver:
                     curr_solution, curr_solution_cost = explored_solution.copy(), explored_solution_cost
 
             temperature *= self.alpha  # cool the temperature
-
             delta_time = time.time() - self.start_time
 
         assert len(self.best_solution) == len(set(self.best_solution))

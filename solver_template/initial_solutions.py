@@ -4,6 +4,7 @@ from itertools import permutations
 
 from repair_methods import RepairMethods
 
+
 class InitialSolutions:
     @staticmethod
     def brute_force(distance_matrix: List[List[float]]):

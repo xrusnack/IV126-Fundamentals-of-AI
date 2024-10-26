@@ -4,6 +4,7 @@ import json
 import time
 import logging
 import math
+import random
 
 import matplotlib.pyplot as plt
 
@@ -104,9 +105,8 @@ def _load_instances() -> Dict[str, Instance]:
 
 def _lsn_test(
     instance: Instance,
-    timeout: int,
+    timeout: int
 ):
-    optimizer = Optimizer()
 
     coords = cast(Coordinates, instance["Coordinates"])
     city_count = len(coords)
@@ -114,19 +114,23 @@ def _lsn_test(
     global_best_val = cast(float, instance["GlobalBestVal"])
     distance_matrix = cast(Matrix, instance["Matrix"])
 
+    optimizer = Optimizer(distance_matrix)
+
     start_time = time.time()
     prev_time = start_time
+    delta_time: float = 0
+    temperature: float = 100
 
-    # INIT SOL
+    # INITIAL SOL
     curr_solution, curr_solution_cost = optimizer.initial(city_count, distance_matrix)
-
     best_solution, best_solution_cost = curr_solution.copy(), curr_solution_cost
 
     assert city_count == len(best_solution)
     assert _all_different(best_solution)
 
-    while True:
+    while delta_time < timeout:
     # for _ in range(100):
+        optimizer.cost.append(curr_solution_cost)
         explored_sol = curr_solution.copy()
 
         # DESTROY
@@ -136,31 +140,37 @@ def _lsn_test(
         
         if explored_sol_cost < curr_solution_cost:
             best_solution, best_solution_cost = explored_sol.copy(), explored_sol_cost
-        
-        if _accept(explored_sol_cost, curr_solution_cost):
-            curr_solution, curr_solution_cost = explored_sol.copy(), explored_sol_cost
-            optimizer.improved()
         else:
-            optimizer.steps_not_improved += 1
+            # optimizer.steps_not_improved += 1
+            optimizer.stuck()
+        
+        delta_cost = explored_sol_cost - curr_solution_cost
+        if (
+            delta_cost < 0 \
+            or random.random() < math.exp(-delta_cost / temperature)
+        ):
+            curr_solution, curr_solution_cost = explored_sol.copy(), explored_sol_cost
 
         curr_time = time.time()
         if curr_time - prev_time > 5:
             LOG.info(f"Running for {int(curr_time - start_time)} seconds")
             prev_time = curr_time
         
-        if curr_time - start_time > timeout:
-            LOG.info("Killing after timeout reached.")
-            break
+        _plot_solution(coords, (curr_solution, curr_solution_cost), (global_best, global_best_val))
 
-
-        _plot_solution(coords, (best_solution, best_solution_cost), (global_best, global_best_val))
+        temperature *= 0.97
+        delta_time = time.time() - start_time
+    
+    LOG.info("Killing after timeout reached.")
 
     assert _all_different(best_solution)
 
-    return best_solution, best_solution_cost
+    optimizer.cost.append(curr_solution_cost)
+    
+    return best_solution, best_solution_cost, optimizer
 
 
-def _run_single(name: str, instance: Instance):
+def _run_single(name: str, instance: Instance, block: bool =False):
     coords = cast(Coordinates, instance["Coordinates"])
     global_best = cast(Solution, instance["GlobalBest"])
     global_best_val = cast(float, instance["GlobalBestVal"])
@@ -172,7 +182,7 @@ def _run_single(name: str, instance: Instance):
 
     _plot_solution(coords, None, (global_best, global_best_val))
 
-    best_solution, best_solution_cost = _lsn_test(instance, timeout)
+    best_solution, best_solution_cost, optimizer = _lsn_test(instance, timeout)
 
     LOG.info(f"Best solution found cost: {best_solution_cost}")
     LOG.info(f"Global best cost: {global_best_val}")
@@ -181,7 +191,10 @@ def _run_single(name: str, instance: Instance):
     print("\n")
 
     _plot_solution(coords, (best_solution, best_solution_cost), (global_best, global_best_val))
-    plt.show(block=True) # type: ignore
+    plt.show(block=block) # type: ignore
+
+    plt.plot(optimizer.cost, label="Cost")
+    plt.show(block=block) # type: ignore
 
     return best_solution
 
@@ -198,8 +211,10 @@ def _run():
 
     # _run_all(instances)
 
-    which = "tsp_202.json"
-    _ = _run_single(which, instances[which])
+    # which = "tsp_280.json"
+    # which = "tsp_100_C.json"
+    which = "tsp_280.json"
+    _ = _run_single(which, instances[which], block=True)
 
 
 if __name__ == "__main__":

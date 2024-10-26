@@ -51,7 +51,7 @@ class DestroyMethods:
         solution: List[int],
         solution_cost: float,
         distance_matrix: List[List[float]],
-        n: int=5
+        n: int=10
     ) -> Tuple[List[int], float]:
         """
         This method removes the specified number of cities based on the distance matrix
@@ -79,8 +79,8 @@ class DestroyMethods:
         solution: List[int],
         solution_cost: float,
         distance_matrix: List[List[float]],
-        alpha: float=10,
-        limit: int=10
+        n: int=30,
+        alpha: float=200
     ) -> Tuple[List[int], float]:
         """
         """
@@ -120,10 +120,10 @@ class DestroyMethods:
         deleted_cities_i: List[int] = [seed_city_i]
 
         popped = related_cities.pop()
-        while limit > 0 and popped[2] < alpha:
+        while n > 0 and popped[2] < alpha:
             deleted_cities.append(popped[0])
             deleted_cities_i.append(popped[1])
-            limit -= 1
+            n -= 1
             popped = related_cities.pop()
 
         return deleted_cities, DestroyMethods.count_cost(deleted_cities_i, solution, solution_cost, distance_matrix)
