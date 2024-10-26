@@ -40,9 +40,11 @@ RepairMethod = Callable[
 
 
 class Optimizer:
-    def __init__(self, distance_matrix: List[List[float]]):
-        LOG.info("Optimizer initialized!")
+    def __init__(self, distance_matrix: List[List[float]], verbose: bool=False):
+        if verbose:
+            LOG.info("Optimizer initialized!")
 
+        self.verbose = verbose
         self.distance_matrix = distance_matrix
         self.city_count = len(distance_matrix[0])
         self.steps_not_improved = 0
@@ -81,7 +83,9 @@ class Optimizer:
         init_name = self.init_methods[self.current_init_method].__name__
         destroy_name = self.destroy_methods[self.current_destroy_method].__name__
         repair_name = self.repair_methods[self.current_repair_method].__name__
-        LOG.info(f"Default methods: {init_name}, {destroy_name}, {repair_name}. Using 2-opt as well!")
+
+        if self.verbose:
+            LOG.info(f"Default methods: {init_name}, {destroy_name}, {repair_name}. Using 2-opt as well!")
 
     def _compute_distance_qunatile(self, q: float=0.2) -> float:
         distances = [self.distance_matrix[i][j] for i in range(len(self.distance_matrix)) for j in range(i + 1, len(self.distance_matrix))]
@@ -100,16 +104,20 @@ class Optimizer:
         new_destroy_name = self.destroy_methods[self.current_destroy_method].__name__
         last_destroy_method_name = self.destroy_methods[last_destroy_method].__name__
         
-        LOG.info(f"Changing destroy from \"{last_destroy_method_name}\" method to \"{new_destroy_name}\"!")
+        if self.verbose:
+            LOG.info(f"Changing destroy from \"{last_destroy_method_name}\" method to \"{new_destroy_name}\"!")
 
         if self.current_destroy_method < last_destroy_method:
             last_repair_method_name = self.repair_methods[self.current_repair_method].__name__
             self.current_repair_method = (self.current_repair_method + 1) % len(self.repair_methods)
             new_repair_name = self.repair_methods[self.current_repair_method].__name__
-            LOG.info(f"Changing repair method from \"{last_repair_method_name}\" to \"{new_repair_name}\"!")
+
+            if self.verbose:
+                LOG.info(f"Changing repair method from \"{last_repair_method_name}\" to \"{new_repair_name}\"!")
     
     def _tweak_params(self):
-        LOG.info("Tweaking parameters!")
+        if self.verbose:
+            LOG.info("Tweaking parameters!")
 
         if self.current_destroy_method == 0:
             pass 
