@@ -2,36 +2,6 @@ import random
 from typing import List, Tuple, Dict
 
 
-def _calc_sum_distance(city_i: int, solution: List[int], distance_matrix: List[List[float]]) -> float:
-    city = solution[city_i]
-    prev = solution[(city_i - 1) % len(solution)]
-    next = solution[(city_i + 1) % len(solution)]
-
-    return distance_matrix[city][prev] + distance_matrix[city][next]
-
-
-def _calculate_related_cities(
-    seed_city: int,
-    seed_city_sum_distance: float,
-    solution: List[int],
-    distance_matrix: List[List[float]]
-):
-    related_cities: List[Tuple[int, int, float]] = []
-    
-    for city_i, city in enumerate(solution):
-        if city == seed_city:
-            continue
-
-        city_sum_distance = _calc_sum_distance(city_i, solution, distance_matrix)
-        related_cities.append((
-            city,
-            city_i,
-            abs(city_sum_distance - seed_city_sum_distance),
-        ))
-
-    return sorted(related_cities, key=lambda x: x[2], reverse=True)
-
-
 class DestroyMethods:
     @staticmethod
     def count_cost(del_indices: List[int], solution: List[int], solution_cost: float,
@@ -68,7 +38,7 @@ class DestroyMethods:
 
         Note: The solution is modified in-place (the cities are removed).
         """
-        n = len(solution) // 2 # random.randint(1, max(1, len(solution) // 2))
+        n = len(solution) // 2
         del_indices = random.sample(range(len(solution)), n)
         del_cities = [solution[i] for i in del_indices]
         new_cost = DestroyMethods.count_cost(del_indices, solution, solution_cost, distance_matrix)
@@ -144,3 +114,33 @@ class DestroyMethods:
             popped = related_cities.pop()
 
         return deleted_cities, DestroyMethods.count_cost(deleted_cities_i, solution, solution_cost, distance_matrix)
+
+
+def _calc_sum_distance(city_i: int, solution: List[int], distance_matrix: List[List[float]]) -> float:
+    city = solution[city_i]
+    prev = solution[(city_i - 1) % len(solution)]
+    next = solution[(city_i + 1) % len(solution)]
+
+    return distance_matrix[city][prev] + distance_matrix[city][next]
+
+
+def _calculate_related_cities(
+        seed_city: int,
+        seed_city_sum_distance: float,
+        solution: List[int],
+        distance_matrix: List[List[float]]
+):
+    related_cities: List[Tuple[int, int, float]] = []
+
+    for city_i, city in enumerate(solution):
+        if city == seed_city:
+            continue
+
+        city_sum_distance = _calc_sum_distance(city_i, solution, distance_matrix)
+        related_cities.append((
+            city,
+            city_i,
+            abs(city_sum_distance - seed_city_sum_distance),
+        ))
+
+    return sorted(related_cities, key=lambda x: x[2], reverse=True)

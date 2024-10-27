@@ -13,11 +13,8 @@ class RepairMethods:
         distance_matrix: List[List[float]],
     ) -> float:
         """
-        Very primitive repair method - randomly inserts deleted cities back into the solution.
-
+        This method randomly inserts deleted cities back into the solution.
         Used only for testing purposes.
-        LNS solver uses incremental evaluation of the cost function.
-        Also, this method is not optimized for performance.
         """
         while deleted_cities:
             city = deleted_cities.pop()

@@ -23,8 +23,8 @@ class InitialSolutions:
     @staticmethod
     def greedy(city_count: int, distance_matrix: List[List[float]]) -> Tuple[List[int], float]:
         """
-        Slightly more complex initial solution - greedy algorithm.
-        Starts with random city and iteratively adds the closest unvisited city.
+        This is a greedy method - it starts with random city and iteratively
+        adds the closest unvisited city.
 
         Returns: A tuple (initial solution, cost).
         """
