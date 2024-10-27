@@ -1,9 +1,36 @@
 from typing import List, Tuple
 import math
 import itertools
+import random
 
 
 class RepairMethods:
+    @staticmethod
+    def random(
+        solution: List[int],
+        solution_cost: float,
+        deleted_cities: List[int],
+        distance_matrix: List[List[float]],
+    ) -> float:
+        """
+        Very primitive repair method - randomly inserts deleted cities back into the solution.
+
+        Used only for testing purposes.
+        LNS solver uses incremental evaluation of the cost function.
+        Also, this method is not optimized for performance.
+        """
+        while deleted_cities:
+            city = deleted_cities.pop()
+
+            index = random.randint(0, len(solution))
+            insertion_cost = RepairMethods.count_cost(index, city, solution, distance_matrix)
+
+            solution.insert(index, city)
+            solution_cost += insertion_cost
+
+        return solution_cost
+    
+
     @staticmethod
     def count_cost_trivial(solution: List[int], distance_matrix: List[List[float]]) -> float:
         """
@@ -12,10 +39,12 @@ class RepairMethods:
 
         Note: Used for testing (the LNS solver uses incremental evaluation of the cost function).
         """
-        cost = 0
+        cost: float = 0
+        
         for i in range(len(solution)):
             j = (i + 1) % len(solution)
             cost += distance_matrix[solution[i]][solution[j]]
+
         return cost
 
 
@@ -127,4 +156,3 @@ class RepairMethods:
         RepairMethods.two_opt_swap(solution, best_swap_indices[0], best_swap_indices[1])
 
         return best_solution_cost
-

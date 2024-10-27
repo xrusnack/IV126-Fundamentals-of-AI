@@ -1,9 +1,32 @@
 import random
 from typing import Tuple, List
+from itertools import permutations
+
 from repair_methods import RepairMethods
 
 
 class InitialSolutions:
+    @staticmethod
+    def brute_force(distance_matrix: List[List[float]]):
+        city_count = len(distance_matrix)
+        assert city_count <= 6, "Unsuable for more than 6 cities."
+
+        cities = list(range(city_count))
+        best_solution: List[int] = []
+        best_solution_cost = float('inf')
+
+        for route in permutations(cities):
+            solution = list(route)
+            current_distance = RepairMethods.count_cost_trivial(solution, distance_matrix)
+
+            if current_distance < best_solution_cost:
+                best_solution = solution
+                best_solution_cost = current_distance
+        
+        return best_solution, best_solution_cost
+        
+
+
     @staticmethod
     def random(city_count: int, distance_matrix: List[List[float]]) -> Tuple[List[int], float]:
         """
@@ -13,7 +36,8 @@ class InitialSolutions:
         """
         cities = list(range(city_count))
         random.shuffle(cities)
-        cost = RepairMethods.count_cost(cities, distance_matrix)
+        cost = RepairMethods.count_cost_trivial(cities, distance_matrix)
+
         return cities, cost
 
 
@@ -29,7 +53,7 @@ class InitialSolutions:
         current_city = unvisited.pop()
 
         solution = [current_city]
-        solution_cost = 0
+        solution_cost: float = 0
 
         while unvisited:
             next_city = min(unvisited, key=lambda city: distance_matrix[current_city][city])
