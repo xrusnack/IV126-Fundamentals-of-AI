@@ -233,10 +233,6 @@ def _run_all(instances: Dict[str, Instance]):
 def _run():
     instances = _load_instances()
 
-    # _run_all(instances)
-
-    # which = "tsp_280.json"
-    # which = "tsp_100_C.json"
     which = "tsp_280.json"
     _ = _run_single(which, instances[which], block=True)
 

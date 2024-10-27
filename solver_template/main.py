@@ -17,6 +17,6 @@ if __name__ == "__main__":
     LNS_solver: LNSSolver = LNSSolver(instance["Matrix"], instance['Timeout'], output_path)
     LNS_solver.solve()
 
-    print("GlobalBest: ", instance["GlobalBest"], "GlobalBestVal: ", instance["GlobalBestVal"])
+    #print("GlobalBest: ", instance["GlobalBest"], "GlobalBestVal: ", instance["GlobalBestVal"])
 
     write_instance_json(LNS_solver.best_solution, output_path)

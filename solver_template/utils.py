@@ -5,7 +5,7 @@ import logging
 
 
 LOG = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='[%(asctime)s][%(levelname)-5.5s][%(name)-.20s] %(message)s')
+logging.basicConfig(level=logging.WARN, format='[%(asctime)s][%(levelname)-5.5s][%(name)-.20s] %(message)s')
 
 
 def read_instance_json(file_path: str):

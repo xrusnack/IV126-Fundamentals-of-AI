@@ -7,27 +7,6 @@ from repair_methods import RepairMethods
 
 class InitialSolutions:
     @staticmethod
-    def brute_force(distance_matrix: List[List[float]]):
-        city_count = len(distance_matrix)
-        assert city_count <= 6, "Unsuable for more than 6 cities."
-
-        cities = list(range(city_count))
-        best_solution: List[int] = []
-        best_solution_cost = float('inf')
-
-        for route in permutations(cities):
-            solution = list(route)
-            current_distance = RepairMethods.count_cost_trivial(solution, distance_matrix)
-
-            if current_distance < best_solution_cost:
-                best_solution = solution
-                best_solution_cost = current_distance
-        
-        return best_solution, best_solution_cost
-        
-
-
-    @staticmethod
     def random(city_count: int, distance_matrix: List[List[float]]) -> Tuple[List[int], float]:
         """
         The most basic initial solution - random permutation of cities.
@@ -67,14 +46,19 @@ class InitialSolutions:
 
 
     @staticmethod
-    def greedy_foreach():
-        """
-        Idea to improve basic greedy algo.
-        Run it for every city as a starting point and return the best solution.
-        """
-        pass
+    def brute_force(distance_matrix: List[List[float]]):
+        city_count = len(distance_matrix)
 
+        cities = list(range(city_count))
+        best_solution: List[int] = []
+        best_solution_cost = float('inf')
 
-    @staticmethod
-    def chris_serd_algo():
-        pass
+        for route in permutations(cities):
+            solution = list(route)
+            current_distance = RepairMethods.count_cost_trivial(solution, distance_matrix)
+
+            if current_distance < best_solution_cost:
+                best_solution = solution
+                best_solution_cost = current_distance
+        
+        return best_solution, best_solution_cost

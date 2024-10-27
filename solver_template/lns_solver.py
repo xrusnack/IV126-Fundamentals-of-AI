@@ -11,7 +11,7 @@ from destroy_methods import DestroyMethods
 
 
 LOG = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='[%(asctime)s][%(levelname)-5.5s][%(name)-.20s] %(message)s')
+logging.basicConfig(level=logging.WARN, format='[%(asctime)s][%(levelname)-5.5s][%(name)-.20s] %(message)s')
 
 
 class LNSSolver:
