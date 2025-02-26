@@ -1,3 +1,7 @@
+# Assignment
+Given a set of locations and distances between each pair of locations, the goal of the traveling salesman problem (TSP) is to find the shortest cyclic route visiting each location exactly once. Implement a TSP solver based on the large neighborhood search (LNS) metaheuristic.
+
+
 # Assignment package contents
 
 This package contains data instances, additional detailed information about the assignment and tools prepared for your convenience:
